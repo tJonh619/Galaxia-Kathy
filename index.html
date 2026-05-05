@@ -74,6 +74,64 @@
         from { opacity: 0; transform: translateY(20px);}
         to { opacity: 1; transform: translateY(0);}
     }
+
+
+    /* SOBRE */
+.envelope {
+    position: relative;
+    width: 300px;
+    height: 190px;
+    margin: 40px auto;
+    background: linear-gradient(135deg, #ff4b5c, #ff6b7a);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.envelope:hover {
+    transform: scale(1.05);
+}
+
+/* TAPA */
+.flap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ff7f8a;
+    clip-path: polygon(0 0, 50% 65%, 100% 0);
+    transform-origin: top;
+    transition: transform 0.8s ease;
+    border-radius: 12px;
+}
+
+/* CARTA */
+.letter {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    width: 270px;
+    background: #fff;
+    color: #333;
+    padding: 20px;
+    border-radius: 12px;
+    opacity: 0;
+    transition: all 0.8s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    z-index: 1;
+}
+
+/* ANIMACIÓN MEJORADA */
+.envelope.open .flap {
+    transform: rotateX(180deg);
+}
+
+.envelope.open .letter {
+    top: -240px;
+    opacity: 1;
+}
+
 </style>
 </head>
 
@@ -82,25 +140,31 @@
 <header>
     <h1>Para Katherine Brown 💖</h1>
     <p>
-        Desde que llegaste a mi vida, todo cambió...  
-        Hoy quiero que esta página sea una pequeña muestra de lo mucho que te amo.
+        Desde que llegaste a mi vida, todo cambió. La oscuridad que habia en mi mundo desaparecio y todo se volvio luz, alegria y esperanza. Muchas gracias por estar en mi vida, por ser mi novia y por amarme tanto como yo te amo a ti...  
+        Esto es algo pequeño, pero quiero que esta página sea una muestra de lo mucho que te amo.
     </p>
-    <button class="btn" onclick="mostrarMensaje()">Haz clic aquí 💌</button>
+    <button class="btn" onclick="irACarta()">Haz clic aquí 💌</button>
 </header>
 
-<section>
+<section id="carta">
     <h2>Lo que siento por ti 💕</h2>
 
-    <div class="card">
-        Eres la persona que ilumina mis días, la razón de mis sonrisas y mi pensamiento constante.
-    </div>
+    <div class="envelope" onclick="abrirCarta(this)">
+        <div class="flap"></div>
 
-    <div class="card">
-        No hay momento en el que no piense en ti, en tu voz, en tu sonrisa tan hermosa.
-    </div>
+        <div class="letter">
+            <p>
+                Eres la persona que ilumina mis días, la razón de mis sonrisas, la razón de mis esfuerzos y mi pensamiento constante e incansable 24/7.
+            </p>
 
-    <div class="card">
-        Quiero construir contigo un futuro lleno de amor, sueños y momentos inolvidables.
+            <p>
+                No hay momento en el que no piense en ti, en tu voz, en tu sonrisa tan hermosa, en tus ojitos tan bellos, en tu cabello rizado y en la felicidad que me da tenerte como mi novia y futura esposa.
+            </p>
+
+            <p>
+                Quiero construir contigo un futuro lleno de amor, sueños y momentos inolvidables, momentos en los que nos enamoraremos más y más… te quiero eternamente junto a mí, Kathy 💗
+            </p>
+        </div>
     </div>
 </section>
 
@@ -108,8 +172,8 @@
     <h2>Mi promesa 💍</h2>
 
     <p>
-        Prometo amarte cada día más, cuidarte, respetarte y nunca soltarte.  
-        Porque tú eres y siempre serás el amor de mi vida 💗
+        Prometo amarte cada día más, hacerte muy feliz, cuidarte, respetarte y nunca soltarte.  
+        Porque tú eres y siempre serás el amor de mi vida y con quien deseo estar por siempre, hasta mi ultimo 💗
     </p>
 </section>
 
@@ -122,6 +186,42 @@ function mostrarMensaje() {
     alert("Te amo muchísimo Katherine 💖 Eres lo mejor que me ha pasado 💕");
 }
 </script>
+<script>
+function abrirCarta(element) {
+    element.classList.toggle("open");
+    crearCorazones();
+}
 
+function crearCorazones() {
+    for (let i = 0; i < 15; i++) {
+        let heart = document.createElement("div");
+        heart.innerHTML = "💖";
+        heart.style.position = "fixed";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.top = "100vh";
+        heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+        heart.style.opacity = 0.8;
+        heart.style.transition = "transform 3s linear, opacity 3s";
+
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+            heart.style.transform = "translateY(-120vh)";
+            heart.style.opacity = 0;
+        }, 50);
+
+        setTimeout(() => {
+            heart.remove();
+        }, 3000);
+    }
+}
+</script>
+<script>
+function irACarta() {
+    document.getElementById("carta").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+</script>
 </body>
 </html>
