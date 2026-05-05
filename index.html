@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para Katherine 💖</title>
+<title>Para Kathy 💖</title>
 
 <style>
     body {
@@ -51,11 +51,31 @@
     }
 
     section {
-        padding: 60px 20px;
-        background: #fff;
-        color: #333;
+    padding: 80px 20px;
+    margin: 60px auto;
+    max-width: 1400px;
+    border-radius: 20px;
+    background: #fff;
+    color: #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
 
+    section::before {
+    content: "💖";
+    display: block;
+    font-size: 24px;
+    margin-bottom: 15px;
+    opacity: 0.6;
+    } 
+
+    h2 {
+    margin-bottom: 30px;
+    color: #ff4b5c;
+    }
+
+    section:nth-of-type(even) {
+    background: #fff0f3;
+    }
     .card {
         background: #ffe0e6;
         margin: 20px auto;
