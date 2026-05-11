@@ -251,27 +251,23 @@ function irGaleria(){
     });
 }
 
-/* EXTENSIONES POSIBLES */
+/* CONFIGURACIÓN */
 const extensiones = ['png'];
-
-/* MENSAJE POR DEFECTO SI NO EXISTE EL ARCHIVO DE TEXTO */
 const mensajePorDefecto = "Eres el amor más hermoso que ha llegado a mi vida 💖";
+const LIMITE_FOTOS = 100;
 
-/* FUNCIÓN PARA LEER LA DESCRIPCIÓN DESDE Texto/fotoX.txt */
+/* LEER DESCRIPCIÓN DESDE Texto/FotoX.txt */
 async function obtenerDescripcion(numeroFoto) {
-    const rutaTexto = `Texto/foto${numeroFoto}.txt`;
+    const rutaTexto = `Texto/Foto${numeroFoto}.txt`;
 
     try {
-        const respuesta = await fetch(rutaTexto);
+        const respuesta = await fetch(rutaTexto, { cache: 'no-cache' });
 
-        // Si el archivo no existe
         if (!respuesta.ok) {
             return mensajePorDefecto;
         }
 
         const texto = await respuesta.text();
-
-        // Retornar el contenido del archivo o el mensaje por defecto
         return texto.trim() || mensajePorDefecto;
 
     } catch (error) {
@@ -279,66 +275,82 @@ async function obtenerDescripcion(numeroFoto) {
     }
 }
 
-/* FUNCIÓN PARA CREAR LA GALERÍA AUTOMÁTICAMENTE */
+/* VERIFICAR SI UNA IMAGEN EXISTE */
+function verificarImagen(rutaImagen) {
+    return new Promise(resolve => {
+        const img = new Image();
+
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+
+        img.src = rutaImagen;
+    });
+}
+
+/* CREAR UNA TARJETA */
+function crearCard(rutaImagen, numeroFoto, descripcion) {
+    const card = document.createElement('div');
+    card.className = 'image-card';
+
+    card.innerHTML = `
+        <img src="${rutaImagen}" alt="Foto ${numeroFoto}" loading="lazy">
+        <div class="overlay">
+            <p>${descripcion}</p>
+        </div>
+    `;
+
+    return card;
+}
+
+/* CREAR GALERÍA MÁS RÁPIDA */
 async function crearGaleria() {
     const gallery = document.getElementById('gallery');
-    let numeroFoto = 1;
-
-    // Limpiar la galería
     gallery.innerHTML = '';
 
-    // Buscar imágenes consecutivas: foto1, foto2, foto3...
-    while (numeroFoto <= 100) { // límite de seguridad
-        let imagenEncontrada = false;
+    const fragment = document.createDocumentFragment();
 
-        // Probar con cada extensión permitida
-        for (const extension of extensiones) {
-            const rutaImagen = `Galeria/Foto${numeroFoto}.${extension}`;
+    // Crear todas las tareas en paralelo
+    const tareas = [];
 
-            // Verificar si la imagen existe
-            const existe = await new Promise(resolve => {
-                const img = new Image();
+    for (let numeroFoto = 1; numeroFoto <= LIMITE_FOTOS; numeroFoto++) {
+        const rutaImagen = `Galeria/Foto${numeroFoto}.png`;
 
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
+        tareas.push(
+            (async () => {
+                const existe = await verificarImagen(rutaImagen);
 
-                img.src = rutaImagen;
-            });
+                if (!existe) {
+                    return null;
+                }
 
-            if (existe) {
-                imagenEncontrada = true;
-
-                // Obtener la descripción desde Texto/fotoX.txt
                 const descripcion = await obtenerDescripcion(numeroFoto);
 
-                // Crear tarjeta
-                const card = document.createElement('div');
-                card.className = 'image-card';
-
-                card.innerHTML = `
-                    <img src="${rutaImagen}" alt="Foto ${numeroFoto}">
-                    <div class="overlay">
-                        <p>${descripcion}</p>
-                    </div>
-                `;
-
-                gallery.appendChild(card);
-
-                // Ya se encontró la imagen, no seguir probando extensiones
-                break;
-            }
-        }
-
-        // Si no existe la siguiente imagen, detener el proceso
-        if (!imagenEncontrada) {
-            break;
-        }
-
-        numeroFoto++;
+                return crearCard(
+                    rutaImagen,
+                    numeroFoto,
+                    descripcion
+                );
+            })()
+        );
     }
 
-    // Ejecutar la animación después de crear todas las tarjetas
-    setTimeout(mostrarCards, 200);
+    // Esperar a que todas terminen
+    const cards = await Promise.all(tareas);
+
+    // Agregar únicamente las tarjetas válidas
+    cards.forEach(card => {
+        if (card) {
+            fragment.appendChild(card);
+        }
+    });
+
+    // Insertar todo de una sola vez (mucho más rápido)
+    gallery.appendChild(fragment);
+
+    // Ejecutar animación
+    requestAnimationFrame(() => {
+        mostrarCards();
+    });
 }
 
 /* FADE IN */
@@ -374,14 +386,14 @@ function crearCorazon() {
 }
 
 /* INICIALIZACIÓN */
-window.addEventListener('load', async () => {
-    await crearGaleria();
+window.addEventListener('load', () => {
+    crearGaleria(); // ahora carga mucho más rápido
     mostrarCards();
 });
 
 window.addEventListener('scroll', mostrarCards);
 
-/* Generar corazones continuamente */
-setInterval(crearCorazon, 700);
+/* GENERAR CORAZONES */
+setInterval(crearCorazon, 300);
 
 </script>
